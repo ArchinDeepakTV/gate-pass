@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Add New Entry</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+        }
+
+        form {
+            width: 60%;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-gap: 20px;
+        }
+
+        .form-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .item-details-row {
+            display: flex;
+            align-items: center;
+        }
+
+        label {
+            margin-bottom: 5px;
+        }
+
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            box-sizing: border-box;
+        }
+
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <h1 style="text-align: center;">Add New Gate Pass Entry</h1>
+    <form action="/add" method="POST">
+        <div class="form-item">
+            <label for="serialNumber">Serial Number:</label>
+            <input type="text" id="serialNumber" name="serialNumber" disabled>
+        </div>
+
+        <div class="form-item">
+            <label for="date">Date:</label>
+            <input type="text" id="date" name="date" disabled value="<%= today %>">
+        </div>
+
+        <div class="form-item">
+            <label for="personName">Name of Personnel:</label>
+            <input type="text" id="personName" name="personName" required>
+        </div>
+
+        <div class="form-item">
+            <label for="source">Source Location:</label>
+            <input type="text" id="source" name="source" required>
+        </div>
+
+        <div class="form-item">
+            <label for="destination">Destination Location:</label>
+            <input type="text" id="destination" name="destination" required>
+        </div>
+
+        <div class="form-item">
+            <label for="reason">Reason:</label>
+            <input type="text" id="reason" name="reason" placeholder="non mandatory">
+        </div>
+
+        <div class="form-item" style="grid-column: span 2;">
+            <h2>Item Details</h2>
+            <div id="item-details-container">
+                <div class="item-details-row">
+                    <span class="serial-number" style="margin-right: 10px;">1.</span>
+                    <textarea name="item_details[]" placeholder="Item Description" rows="2"
+                        style="height: 50px; padding: 10px; box-sizing: border-box; flex-grow: 1;"></textarea>
+                    <input type="number" name="item_quantity[]" placeholder="Quantity" min="1"
+                        style="width: 100px; margin-left: 10px; height: 50px; padding: 10px; box-sizing: border-box;">
+                    <button type="button" class="delete-item-btn" style="margin-left: 10px;">Delete</button>
+                </div>
+            </div>
+            <button type="button" id="add-item-btn" style="margin-top: 10px;">Add Another Item</button>
+        </div>
+
+        <div class="form-item" style="grid-column: span 2; text-align: center;">
+            <input type="submit" value="Add Entry">
+        </div>
+    </form>
+
+    <script>
+        let itemCounter = 1;
+        document.getElementById('add-item-btn').addEventListener('click', function () {
+            const allRows = document.querySelectorAll('.item-details-row');
+            const lastRow = allRows[allRows.length - 1];
+            const description = lastRow.querySelector('textarea').value.trim();
+            const quantity = lastRow.querySelector('input[type="number"]').value.trim();
+
+            if (description === '' || quantity === '') {
+                alert('Please fill in the current item details before adding a new one.');
+                return;
+            }
+
+            itemCounter++;
+            const container = document.getElementById('item-details-container');
+            const newRow = document.createElement('div');
+            newRow.classList.add('item-details-row');
+            newRow.style.marginTop = '10px';
+            newRow.innerHTML = `
+                <span class="serial-number" style="margin-right: 10px;">${itemCounter}.</span>
+                <textarea name="item_details[]" placeholder="Item Description" rows="2" style="height: 50px; padding: 10px; box-sizing: border-box; flex-grow: 1;"></textarea>
+                <input type="number" name="item_quantity[]" placeholder="Quantity" min="1" style="width: 100px; margin-left: 10px; height: 50px; padding: 10px; box-sizing: border-box;">
+                <button type="button" class="delete-item-btn" style="margin-left: 10px;">Delete</button>
+            `;
+            container.appendChild(newRow);
+        });
+
+        document.getElementById('item-details-container').addEventListener('click', function (e) {
+            if (e.target && e.target.classList.contains('delete-item-btn')) {
+                const row = e.target.closest('.item-details-row');
+                if (document.querySelectorAll('.item-details-row').length > 1) {
+                    row.remove();
+                    updateSerialNumbers();
+                } else {
+                    // If it's the last item, clear its content and keep it.
+                    row.querySelector('textarea').value = '';
+                    row.querySelector('input[type="number"]').value = '';
+                }
+                saveData(); // Save data after deletion/clearing
+            }
+        });
+
+        function updateSerialNumbers() {
+            const allRows = document.querySelectorAll('.item-details-row');
+            itemCounter = allRows.length;
+            allRows.forEach((row, index) => {
+                row.querySelector('.serial-number').textContent = `${index + 1}.`;
+            });
+        }
+
+        function saveData() {
+            const data = {
+                personName: document.getElementById('personName').value,
+                source: document.getElementById('source').value,
+                destination: document.getElementById('destination').value,
+                items: []
+            };
+            document.querySelectorAll('.item-details-row').forEach(row => {
+                const description = row.querySelector('textarea').value;
+                const quantity = row.querySelector('input[type="number"]').value;
+                data.items.push({ description, quantity });
+            });
+            sessionStorage.setItem('gatePassForm', JSON.stringify(data));
+        }
+
+        function loadData() {
+            const savedData = sessionStorage.getItem('gatePassForm');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                document.getElementById('personName').value = data.personName;
+                document.getElementById('source').value = data.source;
+                document.getElementById('destination').value = data.destination;
+
+                const container = document.getElementById('item-details-container');
+                container.innerHTML = ''; // Clear existing rows
+                itemCounter = 0;
+
+                if (data.items.length > 0) {
+                    data.items.forEach(item => {
+                        itemCounter++;
+                        const newRow = document.createElement('div');
+                        newRow.classList.add('item-details-row');
+                        newRow.style.marginTop = '10px';
+                        newRow.innerHTML = `
+                            <span class="serial-number" style="margin-right: 10px;">${itemCounter}.</span>
+                            <textarea name="item_details[]" placeholder="Item Description" rows="2" style="height: 50px; padding: 10px; box-sizing: border-box; flex-grow: 1;">${item.description}</textarea>
+                            <input type="number" name="item_quantity[]" placeholder="Quantity" min="1" value="${item.quantity}" style="width: 100px; margin-left: 10px; height: 50px; padding: 10px; box-sizing: border-box;">
+                            <button type="button" class="delete-item-btn" style="margin-left: 10px;">Delete</button>
+                        `;
+                        container.appendChild(newRow);
+                    });
+                } else {
+                    // Add a default empty row if no items were saved
+                    const newRow = document.createElement('div');
+                    newRow.classList.add('item-details-row');
+                    newRow.innerHTML = `
+                        <span class="serial-number" style="margin-right: 10px;">1.</span>
+                        <textarea name="item_details[]" placeholder="Item Description" rows="2" style="height: 50px; padding: 10px; box-sizing: border-box; flex-grow: 1;"></textarea>
+                        <input type="number" name="item_quantity[]" placeholder="Quantity" min="1" style="width: 100px; margin-left: 10px; height: 50px; padding: 10px; box-sizing: border-box;">
+                        <button type="button" class="delete-item-btn" style="margin-left: 10px;">Delete</button>
+                    `;
+                    container.appendChild(newRow);
+                }
+            }
+        }
+
+        function getNextSerialNumber() {
+            let nextSerialNumber = localStorage.getItem('gatePassSerialNumber');
+            if (!nextSerialNumber) {
+                nextSerialNumber = 1;
+            }
+            return parseInt(nextSerialNumber);
+        }
+
+        function updateSerialNumberDisplay() {
+            document.getElementById('serialNumber').value = getNextSerialNumber();
+        }
+
+        function toggleSubmitButton() {
+            const submitBtn = document.querySelector('input[type="submit"]');
+            const allRows = document.querySelectorAll('.item-details-row');
+            let hasItems = false;
+            if (allRows.length > 0) {
+                const lastRow = allRows[allRows.length - 1];
+                const description = lastRow.querySelector('textarea').value.trim();
+                const quantity = lastRow.querySelector('input[type="number"]').value.trim();
+                if (description !== '' && quantity !== '') {
+                    hasItems = true;
+                }
+            }
+            // A more robust check to see if ANY row has data.
+            document.querySelectorAll('.item-details-row').forEach(row => {
+                const description = row.querySelector('textarea').value.trim();
+                const quantity = row.querySelector('input[type="number"]').value.trim();
+                if (description !== '' && quantity !== '') {
+                    hasItems = true;
+                }
+            });
+
+            submitBtn.disabled = !hasItems;
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            loadData();
+            updateSerialNumberDisplay();
+            toggleSubmitButton();
+        });
+        document.querySelector('form').addEventListener('input', function () {
+            saveData();
+            toggleSubmitButton();
+        });
+        document.querySelector('form').addEventListener('submit', async function (e) {
+            e.preventDefault(); // Prevent default form submission
+
+            const serialNumber = document.getElementById('serialNumber').value;
+            const personName = document.getElementById('personName').value;
+            const source = document.getElementById('source').value;
+            const destination = document.getElementById('destination').value;
+            const reason = document.getElementById('reason').value;
+            const date = document.getElementById('date').value;
+            const items = [];
+            document.querySelectorAll('.item-details-row').forEach(row => {
+                const description = row.querySelector('textarea').value;
+                const quantity = row.querySelector('input[type="number"]').value;
+                if (description && quantity) {
+                    items.push({ description, quantity });
+                }
+            });
+
+            const formData = { serialNumber, personName, source, destination, reason, date, items };
+
+            // Generate PDF
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.setFontSize(22);
+            doc.text("Gate Pass", 105, 20, null, null, "center");
+            doc.setFontSize(12);
+            doc.text(`Serial No: ${serialNumber}`, 15, 30);
+            doc.text(`Date: ${date}`, 15, 40);
+            doc.text(`Name of Personnel: ${personName}`, 15, 50);
+            doc.text(`Source: ${source}`, 15, 60);
+            doc.text(`Destination: ${destination}`, 15, 70);
+            doc.setFontSize(16);
+            doc.text("Item Details", 15, 90);
+            doc.setFontSize(12);
+            doc.text("Quantity", 170, 95);
+            let y = 100;
+            items.forEach((item, index) => {
+                doc.setFontSize(12);
+                doc.text(`${index + 1}.`, 20, y);
+                doc.text(item.description, 30, y, { maxWidth: 130 });
+                doc.text(item.quantity, 180, y);
+                y += 10;
+            });
+            doc.line(15, 270, 80, 270); // Signature line
+            doc.text("Signature", 35, 275);
+            doc.output('dataurlnewwindow');
+
+            // Save to DB
+            try {
+                const response = await fetch('/api/add-entry', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData),
+                });
+                if (response.ok) {
+                    console.log('Entry added to DB');
+                    // Clear session and reset form
+                    sessionStorage.removeItem('gatePassForm');
+                    localStorage.setItem('gatePassSerialNumber', getNextSerialNumber() + 1);
+                    document.querySelector('form').reset();
+                    loadData();
+                    updateSerialNumberDisplay();
+                    toggleSubmitButton();
+                } else {
+                    console.error('Failed to add entry to DB');
+                    alert('Error: Could not save entry to the database.');
+                }
+            } catch (error) {
+                console.error('Error submitting form:', error);
+                alert('Error: Could not connect to the server.');
+            }
+        });
+
+        // Also toggle submit on add/delete
+        document.getElementById('add-item-btn').addEventListener('click', toggleSubmitButton);
+        document.getElementById('item-details-container').addEventListener('click', function(e) {
+            if (e.target && e.target.classList.contains('delete-item-btn')) {
+                setTimeout(toggleSubmitButton, 0); // Use timeout to check after DOM update
+            }
+        });
+    </script>
+</body>
+
+</html>

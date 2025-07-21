@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>HCS IT</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 80%;
+            margin: 20px auto;
+        }
+
+        th,
+        td {
+            border: 1px solid #aaa;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #eee;
+        }
+    </style>
+</head>
+
+<body>
+    <h1 style="text-align: center;">Gate Pass Dashboard</h1>
+    <div style="text-align: center;">Your IP Address: <span id="ip-display">Loading...</span></div>
+    <div
+        style="width: 95vw;height: 75vh; margin: auto; display: flex;flex-direction: column;align-items: center; justify-content: center; margin-top: 5vh;">
+        <a href="/history"
+            style="width: 40%;height: 50%; display: flex;align-items: center;justify-content: center; border: 3px inset #aaa; font-size: 75px; text-decoration: none">
+            HISTORY</a>
+        <a href="/add"
+            style="width: 40%;height: 50%; display: flex;align-items: center;justify-content: center; border: 3px inset red;margin-top: 5vh; font-size: 75px; text-decoration: none">
+            ADD NEW
+        </a>
+    </div>
+    <script>
+        fetch("https://api.ipify.org?format=json")
+            .then(response => response.json())
+            .then(data => {
+                console.log("Your Public IP Address is:", data.ip);
+                // Optionally display on page:
+                document.getElementById("ip-display").textContent = data.ip;
+            })
+            .catch(error => console.error("Error fetching IP:", error));
+    </script>
+</body>
+
+</html>
