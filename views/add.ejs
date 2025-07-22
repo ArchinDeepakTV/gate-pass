@@ -220,7 +220,7 @@
                 const response = await fetch('/api/latest-serial-number');
                 if (response.ok) {
                     const data = await response.json();
-                    document.getElementById('serialNumber').value = data.serialNumber + 1;
+                    document.getElementById('serialNumber').value = parseInt(data.serialNumber, 10) + 1;
                 } else {
                     console.error('Failed to fetch latest serial number');
                     document.getElementById('serialNumber').value = 1; // Default on error
