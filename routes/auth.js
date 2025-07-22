@@ -1,20 +1,24 @@
 // authRoutes.js
 const express = require("express");
 const router = express.Router();
-const { addGatePassEntry, getLatestSerialNumber, getHistory } = require('../database');
+const {
+  addGatePassEntry,
+  getLatestSerialNumber,
+  getHistory,
+} = require("../database");
 
 router.use(express.json()); // Middleware to parse JSON bodies
 const dayjs = require("dayjs");
 
 // Show history (GET /history)
 router.get("/history", async (req, res) => {
-    try {
-        const entries = await getHistory();
-        res.render("history", { entries: entries });
-    } catch (error) {
-        console.error('Error fetching history', error);
-        res.status(500).send("Error fetching history");
-    }
+  try {
+    const entries = await getHistory();
+    res.render("history", { entries: entries });
+  } catch (error) {
+    console.error("Error fetching history", error);
+    res.status(500).send("Error fetching history");
+  }
 });
 
 // Handle form submission (POST /add)
@@ -31,30 +35,30 @@ router.get("/add", (req, res) => {
   res.render("add", { today: formattedDate });
 });
 
-router.post('/api/add-entry', async (req, res) => {
-    try {
-        const entryData = req.body;
-        entryData.personName = entryData.personName.toUpperCase();
-        entryData.source = entryData.source.toUpperCase();
-        entryData.destination = entryData.destination.toUpperCase();
-        entryData.reason = entryData.reason.toUpperCase();
+router.post("/api/add-entry", async (req, res) => {
+  try {
+    const entryData = req.body;
+    entryData.personName = entryData.personName.toUpperCase();
+    entryData.source = entryData.source.toUpperCase();
+    entryData.destination = entryData.destination.toUpperCase();
+    entryData.reason = entryData.reason.toUpperCase();
 
-        await addGatePassEntry(entryData);
-        res.status(200).json({ message: 'Entry added successfully' });
-    } catch (error) {
-        console.error('Error in /api/add-entry', error);
-        res.status(500).json({ message: 'Failed to add entry' });
-    }
+    await addGatePassEntry(entryData);
+    res.status(200).json({ message: "Entry added successfully" });
+  } catch (error) {
+    console.error("Error in /api/add-entry", error);
+    res.status(500).json({ message: "Failed to add entry" });
+  }
 });
 
-router.get('/api/latest-serial-number', async (req, res) => {
-    try {
-        const latestSerialNumber = await getLatestSerialNumber();
-        res.status(200).json({ serialNumber: latestSerialNumber });
-    } catch (error) {
-        console.error('Error in /api/latest-serial-number', error);
-        res.status(500).json({ message: 'Failed to get latest serial number' });
-    }
+router.get("/api/latest-serial-number", async (req, res) => {
+  try {
+    const latestSerialNumber = await getLatestSerialNumber();
+    res.status(200).json({ serialNumber: latestSerialNumber });
+  } catch (error) {
+    console.error("Error in /api/latest-serial-number", error);
+    res.status(500).json({ message: "Failed to get latest serial number" });
+  }
 });
 
 module.exports = router;

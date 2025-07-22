@@ -1,63 +1,106 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="UTF-8">
     <title>History</title>
     <style>
-        body { font-family: sans-serif; padding: 20px; }
-        .table-container { max-height: 80vh; overflow-y: auto; }
-        table { border-collapse: collapse; width: 100%; margin-top: 20px; }
-        th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
-        th { background-color: #eee; }
-        .items-list { list-style-type: none; padding-left: 0; }
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+        }
+
+        .table-container {
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #eee;
+        }
+
+        .items-list {
+            list-style-type: none;
+            padding-left: 0;
+        }
     </style>
 </head>
+
 <body>
     <h1 style="text-align: center;">Gate Pass History</h1>
-    <a href="/">< Back to Dashboard</a>
-    <div class="table-container">
-        <table>
-        <thead>
-            <tr>
-                <th>Serial No.</th>
-                <th>Date</th>
-                <th>Personnel</th>
-                <th>Source</th>
-                <th>Destination</th>
-                <th>Reason</th>
-                <th>Items</th>
-            </tr>
-        </thead>
-        <tbody>
-            <% if (entries.length > 0) { %>
-                <% entries.forEach(entry => { %>
-                    <tr>
-                        <td><%= entry.serialNumber %></td>
-                        <td><%= entry.date %></td>
-                        <td><%= entry.personName %></td>
-                        <td><%= entry.source %></td>
-                        <td><%= entry.destination %></td>
-                        <td><%= entry.reason %></td>
-                        <td>
-                            <ul class="items-list">
-                                <% if (entry.items && entry.items.length > 0) { %>
-                                    <% entry.items.forEach(item => { %>
-                                        <li><%= item.description %> (Qty: <%= item.quantity %>)</li>
-                                    <% }); %>
-                                <% } else { %>
-                                    <li>No items</li>
-                                <% } %>
-                            </ul>
-                        </td>
-                    </tr>
-                <% }); %>
-            <% } else { %>
-                <tr>
-                    <td colspan="7" style="text-align: center;">No history found.</td>
-                </tr>
-            <% } %>
-        </tbody>
-    </table>
-    </div>
+    <a href="/">
+        < Back to Dashboard</a>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Serial No.</th>
+                            <th>Date</th>
+                            <th>Personnel</th>
+                            <th>Source</th>
+                            <th>Destination</th>
+                            <th>Reason</th>
+                            <th>Items</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (entries.length> 0) { %>
+                            <% entries.forEach(entry=> { %>
+                                <tr>
+                                    <td>
+                                        <%= entry.serialNumber %>
+                                    </td>
+                                    <td>
+                                        <%= entry.date %>
+                                    </td>
+                                    <td>
+                                        <%= entry.personName %>
+                                    </td>
+                                    <td>
+                                        <%= entry.source %>
+                                    </td>
+                                    <td>
+                                        <%= entry.destination %>
+                                    </td>
+                                    <td>
+                                        <%= entry.reason %>
+                                    </td>
+                                    <td>
+                                        <ul class="items-list">
+                                            <% if (entry.items && entry.items.length> 0) { %>
+                                                <% entry.items.forEach(item=> { %>
+                                                    <li>
+                                                        <%= item.description %> (Qty: <%= item.quantity %>)
+                                                    </li>
+                                                    <% }); %>
+                                                        <% } else { %>
+                                                            <li>No items</li>
+                                                            <% } %>
+                                        </ul>
+                                    </td>
+                                </tr>
+                                <% }); %>
+                                    <% } else { %>
+                                        <tr>
+                                            <td colspan="7" style="text-align: center;">No history found.</td>
+                                        </tr>
+                                        <% } %>
+                    </tbody>
+                </table>
+            </div>
 </body>
+
 </html>
