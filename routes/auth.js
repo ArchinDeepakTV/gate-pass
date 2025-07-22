@@ -32,7 +32,13 @@ router.get("/add", (req, res) => {
 
 router.post('/api/add-entry', async (req, res) => {
     try {
-        await addGatePassEntry(req.body);
+        const entryData = req.body;
+        entryData.personName = entryData.personName.toUpperCase();
+        entryData.source = entryData.source.toUpperCase();
+        entryData.destination = entryData.destination.toUpperCase();
+        entryData.reason = entryData.reason.toUpperCase();
+
+        await addGatePassEntry(entryData);
         res.status(200).json({ message: 'Entry added successfully' });
     } catch (error) {
         console.error('Error in /api/add-entry', error);

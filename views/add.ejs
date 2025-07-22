@@ -268,10 +268,10 @@
             e.preventDefault(); // Prevent default form submission
 
             const serialNumber = document.getElementById('serialNumber').value;
-            const personName = document.getElementById('personName').value;
-            const source = document.getElementById('source').value;
-            const destination = document.getElementById('destination').value;
-            const reason = document.getElementById('reason').value;
+            const personName = document.getElementById('personName').value.toUpperCase();
+            const source = document.getElementById('source').value.toUpperCase();
+            const destination = document.getElementById('destination').value.toUpperCase();
+            const reason = document.getElementById('reason').value.toUpperCase();
             const date = document.getElementById('date').value;
             const items = [];
             document.querySelectorAll('.item-details-row').forEach(row => {
