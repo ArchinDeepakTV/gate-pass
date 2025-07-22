@@ -84,9 +84,22 @@ async function getLatestSerialNumber() {
     }
 }
 
+async function getHistory() {
+    try {
+        const db = mongoClient.db("gate_pass_db");
+        const collection = db.collection("entries");
+        const entries = await collection.find().sort({ serialNumber: -1 }).toArray();
+        return entries;
+    } catch (e) {
+        console.error('Error fetching history from MongoDB', e);
+        return []; // Return empty array on error
+    }
+}
+
 module.exports = {
     connectToMongo,
     addGatePassEntry,
     getLatestSerialNumber,
+    getHistory,
     // pgPool
 };

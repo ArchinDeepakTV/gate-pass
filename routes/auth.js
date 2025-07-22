@@ -1,19 +1,20 @@
 // authRoutes.js
 const express = require("express");
 const router = express.Router();
-const { addGatePassEntry, getLatestSerialNumber } = require('../database');
+const { addGatePassEntry, getLatestSerialNumber, getHistory } = require('../database');
 
 router.use(express.json()); // Middleware to parse JSON bodies
 const dayjs = require("dayjs");
 
 // Show history (GET /history)
-router.get("/history", (req, res) => {
-  // Replace with real data fetching logic
-  const dummyHistory = [
-    { id: 1, item: "Entry 1", date: "2025-07-20" },
-    { id: 2, item: "Entry 2", date: "2025-07-21" },
-  ];
-  res.render("history", { entries: dummyHistory });
+router.get("/history", async (req, res) => {
+    try {
+        const entries = await getHistory();
+        res.render("history", { entries: entries });
+    } catch (error) {
+        console.error('Error fetching history', error);
+        res.status(500).send("Error fetching history");
+    }
 });
 
 // Handle form submission (POST /add)
