@@ -60,32 +60,32 @@
     <h1 style="text-align: center;">Add New Gate Pass Entry</h1>
     <form action="/add" method="POST">
         <div class="form-item">
-            <label for="serialNumber">Serial Number:</label>
+            <label for="serialNumber"><b>Serial Number:</b></label>
             <input type="text" id="serialNumber" name="serialNumber" disabled>
         </div>
 
         <div class="form-item">
-            <label for="date">Date:</label>
+            <label for="date"><b>Date:</b></label>
             <input type="text" id="date" name="date" disabled value="<%= today %>">
         </div>
 
         <div class="form-item">
-            <label for="personName">Name of Personnel:</label>
+            <label for="personName"><b>Name of Personnel:</b></label>
             <input type="text" id="personName" name="personName" required autofocus>
         </div>
 
         <div class="form-item">
-            <label for="source">Source Location:</label>
+            <label for="source"><b>Source Location:</b></label>
             <input type="text" id="source" name="source" required>
         </div>
 
         <div class="form-item">
-            <label for="destination">Destination Location:</label>
+            <label for="destination"><b>Destination Location:</b></label>
             <input type="text" id="destination" name="destination" required>
         </div>
 
         <div class="form-item">
-            <label for="reason">Reason:</label>
+            <label for="reason"><b>Reason:</b></label>
             <input type="text" id="reason" name="reason" placeholder="non mandatory">
         </div>
 
