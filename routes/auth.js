@@ -1,7 +1,7 @@
 // authRoutes.js
 const express = require("express");
 const router = express.Router();
-const { addGatePassEntry } = require('../database');
+const { addGatePassEntry, getLatestSerialNumber } = require('../database');
 
 router.use(express.json()); // Middleware to parse JSON bodies
 const dayjs = require("dayjs");
@@ -37,6 +37,16 @@ router.post('/api/add-entry', async (req, res) => {
     } catch (error) {
         console.error('Error in /api/add-entry', error);
         res.status(500).json({ message: 'Failed to add entry' });
+    }
+});
+
+router.get('/api/latest-serial-number', async (req, res) => {
+    try {
+        const latestSerialNumber = await getLatestSerialNumber();
+        res.status(200).json({ serialNumber: latestSerialNumber });
+    } catch (error) {
+        console.error('Error in /api/latest-serial-number', error);
+        res.status(500).json({ message: 'Failed to get latest serial number' });
     }
 });
 
