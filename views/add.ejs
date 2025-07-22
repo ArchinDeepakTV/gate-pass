@@ -295,11 +295,12 @@
             doc.text(`Name of Personnel: ${personName}`, 15, 50);
             doc.text(`Source: ${source}`, 15, 60);
             doc.text(`Destination: ${destination}`, 15, 70);
+            doc.text(`Reason: ${reason}`, 15, 80);
             doc.setFontSize(16);
-            doc.text("Item Details", 15, 90);
+            doc.text("Item Details", 15, 100);
             doc.setFontSize(12);
-            doc.text("Quantity", 170, 95);
-            let y = 100;
+            doc.text("Quantity", 170, 105);
+            let y = 110;
             items.forEach((item, index) => {
                 doc.setFontSize(12);
                 doc.text(`${index + 1}.`, 20, y);
