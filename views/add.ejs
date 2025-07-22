@@ -174,6 +174,24 @@
             sessionStorage.setItem('gatePassForm', JSON.stringify(data));
         }
 
+        function resetFormToInitialState() {
+            document.querySelector('form').reset();
+            const container = document.getElementById('item-details-container');
+            container.innerHTML = ''; // Clear all item rows
+            itemCounter = 1;
+            const newRow = document.createElement('div');
+            newRow.classList.add('item-details-row');
+            newRow.innerHTML = `
+                <span class="serial-number" style="margin-right: 10px;">1.</span>
+                <textarea name="item_details[]" placeholder="Item Description" rows="2" style="height: 50px; padding: 10px; box-sizing: border-box; flex-grow: 1;"></textarea>
+                <input type="number" name="item_quantity[]" placeholder="Quantity" min="1" style="width: 100px; margin-left: 10px; height: 50px; padding: 10px; box-sizing: border-box;">
+                <button type="button" class="delete-item-btn" style="margin-left: 10px;">Delete</button>
+            `;
+            container.appendChild(newRow);
+            updateSerialNumberDisplay();
+            toggleSubmitButton();
+        }
+
         function loadData() {
             const savedData = sessionStorage.getItem('gatePassForm');
             if (savedData) {
@@ -186,7 +204,7 @@
                 container.innerHTML = ''; // Clear existing rows
                 itemCounter = 0;
 
-                if (data.items.length > 0) {
+                if (data.items && data.items.length > 0) {
                     data.items.forEach(item => {
                         itemCounter++;
                         const newRow = document.createElement('div');
@@ -201,16 +219,7 @@
                         container.appendChild(newRow);
                     });
                 } else {
-                    // Add a default empty row if no items were saved
-                    const newRow = document.createElement('div');
-                    newRow.classList.add('item-details-row');
-                    newRow.innerHTML = `
-                        <span class="serial-number" style="margin-right: 10px;">1.</span>
-                        <textarea name="item_details[]" placeholder="Item Description" rows="2" style="height: 50px; padding: 10px; box-sizing: border-box; flex-grow: 1;"></textarea>
-                        <input type="number" name="item_quantity[]" placeholder="Quantity" min="1" style="width: 100px; margin-left: 10px; height: 50px; padding: 10px; box-sizing: border-box;">
-                        <button type="button" class="delete-item-btn" style="margin-left: 10px;">Delete</button>
-                    `;
-                    container.appendChild(newRow);
+                    resetFormToInitialState();
                 }
             }
         }
@@ -325,10 +334,7 @@
                     console.log('Entry added to DB');
                     // Clear session and reset form
                     sessionStorage.removeItem('gatePassForm');
-                    document.querySelector('form').reset();
-                    loadData();
-                    updateSerialNumberDisplay();
-                    toggleSubmitButton();
+                    resetFormToInitialState();
                 } else {
                     console.error('Failed to add entry to DB');
                     alert('Error: Could not save entry to the database.');
