@@ -5,7 +5,7 @@ require("dotenv").config();
 
 const app = express();
 const authRoutes = require("./routes/auth");
-const { connectToMongo } = require('./database');
+const { connectToMongo } = require("./database");
 const PORT = 2203;
 
 connectToMongo();
@@ -36,6 +36,15 @@ app.get("/", (req, res) => {
 });
 
 app.use("/", authRoutes);
+
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: "OK",
+    uptime: process.uptime(), // Server uptime in seconds
+    timestamp: new Date().toISOString(), // Current server time
+    message: "Server is healthy",
+  });
+});
 
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
